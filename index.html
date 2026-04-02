@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sitruna Campaign Bulk File Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #FFC600;
+  --primary-light: #FFF8D6;
+  --primary-hover: #e6b200;
+  --border: #e5e7eb;
+  --bg: #F9F7F2;
+  --white: #ffffff;
+  --text: #2D3647;
+  --muted: #6b7280;
+  --yellow: #FFF8D6;
+  --yellow-border: #FFC600;
+  --red: #ef4444;
+  --green: #366649;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.header {
+  background: #2D3647;
+  color: #FFC600;
+  padding: 16px 24px;
+}
+.header h1 { font-size: 17px; font-weight: 800; font-family: 'Gotham Bold', 'Nunito Sans', sans-serif; letter-spacing: 0.01em; }
+.header p { font-size: 12px; opacity: 0.65; margin-top: 2px; color: #F9F7F2; }
+.main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+
+/* Cards */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; }
+.card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.card-header:hover { background: #F9F7F2; }
+.card-header h2 { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.card-body { padding: 18px; }
+.collapsed { display: none; }
+
+/* Badges */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+}
+.badge-sp  { background: #FFF8D6; color: #2D3647; }
+.badge-sb  { background: #FEE8DF; color: #F46036; }
+.badge-sbv { background: #E4F9F5; color: #2a9987; }
+.badge-sd  { background: #E0EDE5; color: #366649; }
+.badge-sdv { background: #D9F3F6; color: #17B5C7; }
+.badge-settings { background: #F9F7F2; color: #2D3647; border: 1px solid #e5e7eb; }
+
+/* Forms */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+label.field-label {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+input[type="text"], input[type="number"], input[type="date"], textarea, select {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  background: var(--white);
+  color: var(--text);
+}
+input:focus, textarea:focus, select:focus { border-color: var(--primary); }
+textarea { resize: vertical; min-height: 72px; }
+.hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* Strategy grid */
+.strategy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; margin-top: 14px; }
+.strategy-card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.strategy-card.active { border-color: var(--primary); }
+.strategy-toggle {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; cursor: pointer; user-select: none;
+  background: #F9F7F2;
+}
+.strategy-toggle:hover { background: var(--primary-light); }
+.strategy-card.active .strategy-toggle { background: var(--primary-light); }
+.strategy-toggle input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); }
+.strategy-name { font-weight: 500; flex: 1; font-size: 13px; }
+.strategy-inputs { padding: 12px; border-top: 1px solid var(--border); }
+.strategy-inputs .form-group + .form-group { margin-top: 10px; }
+
+/* Note */
+.note {
+  font-size: 12px; color: #92400e; background: var(--yellow);
+  border-left: 3px solid var(--yellow-border); border-radius: 4px;
+  padding: 8px 10px; margin-bottom: 14px;
+}
+.note-inline { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 6px; }
+
+/* Generate section */
+.generate-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-top: 6px; }
+.generate-card h2 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.generate-card p { font-size: 13px; color: var(--muted); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.btn-dl {
+  padding: 9px 22px; border-radius: 6px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 2px solid; background: white; transition: all 0.15s;
+}
+.btn-dl:hover { color: white; }
+.btn-sp  { border-color: #2D3647; color: #2D3647; }
+.btn-sp:hover  { background: #2D3647; color: #FFC600; }
+.btn-sb  { border-color: #F46036; color: #F46036; }
+.btn-sb:hover  { background: #F46036; }
+.btn-sbv { border-color: #2a9987; color: #2a9987; }
+.btn-sbv:hover { background: #2a9987; }
+.btn-sd  { border-color: #366649; color: #366649; }
+.btn-sd:hover  { background: #366649; }
+.btn-sdv { border-color: #17B5C7; color: #17B5C7; }
+.btn-sdv:hover { background: #17B5C7; }
+.btn-preview { border-color: #2D3647; color: #2D3647; }
+.btn-preview:hover { background: #2D3647; color: #FFC600; }
+
+/* Error */
+.error-msg { margin-top: 12px; color: var(--red); font-size: 13px; display: none; }
+.success-msg { margin-top: 12px; color: var(--green); font-size: 13px; display: none; }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: 8px; padding: 24px;
+  max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+.modal-campaigns { display: flex; flex-direction: column; gap: 4px; }
+.campaign-preview-item {
+  font-size: 12px; padding: 6px 10px; background: #F9F7F2;
+  border-radius: 4px; border-left: 3px solid var(--primary);
+  font-family: monospace;
+}
+.modal-close {
+  margin-top: 16px; padding: 8px 20px; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  cursor: pointer; font-size: 13px; font-weight: 500;
+}
+.modal-close:hover { background: var(--border); }
+.modal-section-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 12px 0 6px; }
+
+/* Chevron */
+.chevron { font-size: 10px; color: var(--muted); transition: transform 0.2s; display: inline-block; }
+.chevron.up { transform: rotate(180deg); }
+
+/* Select all row */
+.strategy-controls { display: flex; gap: 10px; margin-bottom: 2px; }
+.link-btn { background: none; border: none; color: var(--primary); font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; }
+.link-btn:hover { color: var(--primary-hover); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sitruna Campaign Bulk File Generator</h1>
+</div>
+
+<div class="main">
+
+  <!-- Build Settings -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('settings')">
+      <h2><span class="badge badge-settings">Setup</span> Build Settings</h2>
+      <span class="chevron up" id="chevron-settings">&#9660;</span>
+    </div>
+    <div id="body-settings" class="card-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="field-label">Marketplace *</label>
+          <select id="marketplace" onchange="updateCurrency()">
+            <option value="US">🇺🇸 United States (USD)</option>
+            <option value="CA">🇨🇦 Canada (CAD)</option>
+            <option value="MX">🇲🇽 Mexico (MXN)</option>
+            <option value="BR">🇧🇷 Brazil (BRL)</option>
+            <option value="GB">🇬🇧 United Kingdom (GBP)</option>
+            <option value="DE">🇩🇪 Germany (EUR)</option>
+            <option value="FR">🇫🇷 France (EUR)</option>
+            <option value="IT">🇮🇹 Italy (EUR)</option>
+            <option value="ES">🇪🇸 Spain (EUR)</option>
+            <option value="NL">🇳🇱 Netherlands (EUR)</option>
+            <option value="SE">🇸🇪 Sweden (SEK)</option>
+            <option value="PL">🇵🇱 Poland (PLN)</option>
+            <option value="BE">🇧🇪 Belgium (EUR)</option>
+            <option value="TR">🇹🇷 Turkey (TRY)</option>
+            <option value="EG">🇪🇬 Egypt (EGP)</option>
+            <option value="SA">🇸🇦 Saudi Arabia (SAR)</option>
+            <option value="AE">🇦🇪 UAE (AED)</option>
+            <option value="IN">🇮🇳 India (INR)</option>
+            <option value="JP">🇯🇵 Japan (JPY)</option>
+            <option value="AU">🇦🇺 Australia (AUD)</option>
+            <option value="SG">🇸🇬 Singapore (SGD)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Product *</label>
+          <input type="text" id="product" placeholder="e.g. Tumbler" />
+        </div>
+        <div class="form-group">
+          <label class="field-label">Variation *</label>
+          <input type="text" id="variation" placeholder="e.g. 30 oz" />
+        </div>
+        <div class="form-group">
+          <label class="field-label">Portfolio ID</label>
+          <input type="text" id="portfolioId" placeholder="Optional" />
+        </div>
+        <div class="form-group">
+          <label class="field-label">Brand Entity ID</label>
+          <input type="text" id="brandEntityId" placeholder="For SB / SBV (optional)" />
+        </div>
+        <div class="form-group">
+          <label class="field-label">Start Date *</label>
+          <input type="date" id="startDate" />
+        </div>
+        <div class="form-group">
+          <label class="field-label" id="label-budget">Daily Budget (USD $) *</label>
+          <input type="number" id="dailyBudget" placeholder="e.g. 50" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="field-label" id="label-bid">Default Bid (USD $) *</label>
+          <input type="number" id="defaultBid" placeholder="e.g. 1.50" min="0" step="0.01" />
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="form-group">
+        <label class="field-label">Advertised ASINs * (one per line)</label>
+        <textarea id="advertisedAsins" rows="4" placeholder="B07XYZ12345&#10;B08ABC67890"></textarea>
+        <span class="hint">These are the ASINs being advertised (your products).</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SP -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('sp')">
+      <h2><span class="badge badge-sp">SP</span> Sponsored Products</h2>
+      <span class="chevron" id="chevron-sp">&#9660;</span>
+    </div>
+    <div id="body-sp" class="card-body collapsed">
+      <div class="strategy-controls">
+        <button class="link-btn" onclick="selectAll('SP')">Select all</button>
+        <button class="link-btn" onclick="deselectAll('SP')">Deselect all</button>
+      </div>
+      <div class="strategy-grid" id="grid-SP"></div>
+    </div>
+  </div>
+
+  <!-- SB -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('sb')">
+      <h2><span class="badge badge-sb">SB</span> Sponsored Brands</h2>
+      <span class="chevron" id="chevron-sb">&#9660;</span>
+    </div>
+    <div id="body-sb" class="card-body collapsed">
+      <div class="note">Creatives (headline, ASINs, landing page) are configured in Campaign Manager after upload. This generates campaign structure + targeting only.</div>
+      <div class="strategy-controls">
+        <button class="link-btn" onclick="selectAll('SB')">Select all</button>
+        <button class="link-btn" onclick="deselectAll('SB')">Deselect all</button>
+      </div>
+      <div class="strategy-grid" id="grid-SB"></div>
+    </div>
+  </div>
+
+  <!-- SBV -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('sbv')">
+      <h2><span class="badge badge-sbv">SBV</span> Sponsored Brands Video</h2>
+      <span class="chevron" id="chevron-sbv">&#9660;</span>
+    </div>
+    <div id="body-sbv" class="card-body collapsed">
+      <div class="note">Video creatives are configured in Campaign Manager after upload. This generates campaign structure + targeting only.</div>
+      <div class="strategy-controls">
+        <button class="link-btn" onclick="selectAll('SBV')">Select all</button>
+        <button class="link-btn" onclick="deselectAll('SBV')">Deselect all</button>
+      </div>
+      <div class="strategy-grid" id="grid-SBV"></div>
+    </div>
+  </div>
+
+  <!-- SD -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('sd')">
+      <h2><span class="badge badge-sd">SD</span> Sponsored Display</h2>
+      <span class="chevron" id="chevron-sd">&#9660;</span>
+    </div>
+    <div id="body-sd" class="card-body collapsed">
+      <div class="note">Audience targeting (Views RM, Purchase RM, In-market, Interest, Lifestyle) is configured in Campaign Manager after upload. Only Contextual requires ASIN input here.</div>
+      <div class="form-grid" style="max-width:300px; margin-bottom:14px;">
+        <div class="form-group">
+          <label class="field-label">Cost Type</label>
+          <select id="sd-costType">
+            <option value="CPM" selected>CPM</option>
+            <option value="CPC">CPC</option>
+          </select>
+        </div>
+      </div>
+      <div class="strategy-controls">
+        <button class="link-btn" onclick="selectAll('SD')">Select all</button>
+        <button class="link-btn" onclick="deselectAll('SD')">Deselect all</button>
+      </div>
+      <div class="strategy-grid" id="grid-SD"></div>
+    </div>
+  </div>
+
+  <!-- SDV -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('sdv')">
+      <h2><span class="badge badge-sdv">SDV</span> Sponsored Display Video</h2>
+      <span class="chevron" id="chevron-sdv">&#9660;</span>
+    </div>
+    <div id="body-sdv" class="card-body collapsed">
+      <div class="note">Audience targeting is configured in Campaign Manager after upload. Only Contextual requires ASIN input here.</div>
+      <div class="form-grid" style="max-width:300px; margin-bottom:14px;">
+        <div class="form-group">
+          <label class="field-label">Cost Type</label>
+          <select id="sdv-costType">
+            <option value="CPM" selected>CPM</option>
+            <option value="CPC">CPC</option>
+          </select>
+        </div>
+      </div>
+      <div class="strategy-controls">
+        <button class="link-btn" onclick="selectAll('SDV')">Select all</button>
+        <button class="link-btn" onclick="deselectAll('SDV')">Deselect all</button>
+      </div>
+      <div class="strategy-grid" id="grid-SDV"></div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="generate-card">
+    <h2>Generate Bulk Files</h2>
+    <p>Download a separate CSV per ad type. Upload each file to Amazon Campaign Manager.</p>
+    <div class="btn-row">
+      <button class="btn-dl btn-preview" onclick="previewCampaigns()">Preview Campaigns</button>
+      <button class="btn-dl btn-sp"  onclick="generate('SP')">Download SP</button>
+      <button class="btn-dl btn-sb"  onclick="generate('SB')">Download SB</button>
+      <button class="btn-dl btn-sbv" onclick="generate('SBV')">Download SBV</button>
+      <button class="btn-dl btn-sd"  onclick="generate('SD')">Download SD</button>
+      <button class="btn-dl btn-sdv" onclick="generate('SDV')">Download SDV</button>
+    </div>
+    <div class="error-msg" id="error-msg"></div>
+    <div class="success-msg" id="success-msg"></div>
+  </div>
+
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <h3>Campaign Preview</h3>
+    <div id="modal-content"></div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// MARKETPLACES / CURRENCY
+// ============================================================
+
+const MARKETPLACES = {
+  US: { name: 'United States', currency: 'USD', symbol: '$' },
+  CA: { name: 'Canada',        currency: 'CAD', symbol: 'CA$' },
+  MX: { name: 'Mexico',        currency: 'MXN', symbol: 'MX$' },
+  BR: { name: 'Brazil',        currency: 'BRL', symbol: 'R$' },
+  GB: { name: 'United Kingdom',currency: 'GBP', symbol: '£' },
+  DE: { name: 'Germany',       currency: 'EUR', symbol: '€' },
+  FR: { name: 'France',        currency: 'EUR', symbol: '€' },
+  IT: { name: 'Italy',         currency: 'EUR', symbol: '€' },
+  ES: { name: 'Spain',         currency: 'EUR', symbol: '€' },
+  NL: { name: 'Netherlands',   currency: 'EUR', symbol: '€' },
+  SE: { name: 'Sweden',        currency: 'SEK', symbol: 'SEK ' },
+  PL: { name: 'Poland',        currency: 'PLN', symbol: 'PLN ' },
+  BE: { name: 'Belgium',       currency: 'EUR', symbol: '€' },
+  TR: { name: 'Turkey',        currency: 'TRY', symbol: '₺' },
+  EG: { name: 'Egypt',         currency: 'EGP', symbol: 'E£' },
+  SA: { name: 'Saudi Arabia',  currency: 'SAR', symbol: 'SAR ' },
+  AE: { name: 'UAE',           currency: 'AED', symbol: 'AED ' },
+  IN: { name: 'India',         currency: 'INR', symbol: '₹' },
+  JP: { name: 'Japan',         currency: 'JPY', symbol: '¥' },
+  AU: { name: 'Australia',     currency: 'AUD', symbol: 'A$' },
+  SG: { name: 'Singapore',     currency: 'SGD', symbol: 'SGD ' },
+};
+
+function updateCurrency() {
+  const mp  = document.getElementById('marketplace').value;
+  const info = MARKETPLACES[mp] || MARKETPLACES['US'];
+  document.getElementById('label-budget').textContent = `Daily Budget (${info.currency} ${info.symbol}) *`;
+  document.getElementById('label-bid').textContent    = `Default Bid (${info.currency} ${info.symbol}) *`;
+}
+
+// ============================================================
+// STRATEGY DEFINITIONS
+// ============================================================
+
+const SP_STRATEGIES = [
+  { id: 'auto',             name: 'Auto',                   targeting: 'auto',    inputs: [] },
+  { id: 'category',         name: 'Category',               targeting: 'product', inputs: ['categories'],   label: 'Category Browse Node IDs (one per line)' },
+  { id: 'brand-pat',        name: 'Brand PAT',              targeting: 'product', inputs: ['asins'],        label: 'Target ASINs - Brand Products (one per line)' },
+  { id: 'brand',            name: 'Brand',                  targeting: 'keyword', inputs: ['keywords'],     label: 'Brand Keywords (one per line)', matchType: 'exact' },
+  { id: 'competitor-pat',   name: 'Competitor PAT',         targeting: 'product', inputs: ['asins'],        label: 'Target ASINs - Competitor Products (one per line)' },
+  { id: 'competitor',       name: 'Competitor',             targeting: 'keyword', inputs: ['keywords'],     label: 'Competitor Keywords (one per line)', matchType: 'exact' },
+  { id: 'exact',            name: 'Exact',                  targeting: 'keyword', inputs: ['keywords'],     label: 'Keywords (one per line)', matchType: 'exact' },
+  { id: 'phrase',           name: 'Phrase',                 targeting: 'keyword', inputs: ['keywords'],     label: 'Keywords (one per line)', matchType: 'phrase' },
+  { id: 'broad',            name: 'Broad',                  targeting: 'keyword', inputs: ['keywords'],     label: 'Keywords (one per line)', matchType: 'broad' },
+  { id: 'competitor-pat-exp', name: 'Competitor PAT Exp',  targeting: 'product', inputs: ['asins'],        label: 'Target ASINs - Competitor Expansion (one per line)' },
+  { id: 'skc',              name: 'SKC - Targeted Keyword', targeting: 'keyword', inputs: ['skcKeywords'] },
+  { id: 'spc',              name: 'SPC - Targeted ASIN',   targeting: 'product', inputs: ['spcAsins'] },
+];
+
+const SB_STRATEGIES = [
+  { id: 'theme',          name: 'Theme',          targeting: 'auto',    inputs: [] },
+  { id: 'category',       name: 'Category',       targeting: 'product', inputs: ['categories'], label: 'Category Browse Node IDs (one per line)' },
+  { id: 'brand-pat',      name: 'Brand PAT',      targeting: 'product', inputs: ['asins'],      label: 'Target ASINs - Brand Products (one per line)' },
+  { id: 'brand',          name: 'Brand',          targeting: 'keyword', inputs: ['keywords'],   label: 'Brand Keywords (one per line)', matchType: 'exact' },
+  { id: 'competitor-pat', name: 'Competitor PAT', targeting: 'product', inputs: ['asins'],      label: 'Target ASINs - Competitor Products (one per line)' },
+  { id: 'competitor',     name: 'Competitor',     targeting: 'keyword', inputs: ['keywords'],   label: 'Competitor Keywords (one per line)', matchType: 'exact' },
+  { id: 'exact',          name: 'Exact',          targeting: 'keyword', inputs: ['keywords'],   label: 'Keywords (one per line)', matchType: 'exact' },
+  { id: 'phrase',         name: 'Phrase',         targeting: 'keyword', inputs: ['keywords'],   label: 'Keywords (one per line)', matchType: 'phrase' },
+  { id: 'broad',          name: 'Broad',          targeting: 'keyword', inputs: ['keywords'],   label: 'Keywords (one per line)', matchType: 'broad' },
+];
+
+const SBV_STRATEGIES = SB_STRATEGIES.map(s => ({ ...s }));
+
+const SD_STRATEGIES = [
+  { id: 'contextual',   name: 'Contextual',   targeting: 'product',  inputs: ['asins'], label: 'Target ASINs (one per line)', tactic: 'T00001' },
+  { id: 'views-rm',     name: 'Views RM',     targeting: 'audience', inputs: [],        note: 'Audience configured after upload.', tactic: 'T00020' },
+  { id: 'purchase-rm',  name: 'Purchase RM',  targeting: 'audience', inputs: [],        note: 'Audience configured after upload.', tactic: 'T00030' },
+  { id: 'in-market',    name: 'In-market',    targeting: 'audience', inputs: [],        note: 'Audience configured after upload.', tactic: 'T00020' },
+  { id: 'interest',     name: 'Interest',     targeting: 'audience', inputs: [],        note: 'Audience configured after upload.', tactic: 'T00020' },
+  { id: 'lifestyle',    name: 'Lifestyle',    targeting: 'audience', inputs: [],        note: 'Audience configured after upload.', tactic: 'T00020' },
+];
+
+const SDV_STRATEGIES = SD_STRATEGIES.map(s => ({ ...s }));
+
+const STRATEGY_MAP = { SP: SP_STRATEGIES, SB: SB_STRATEGIES, SBV: SBV_STRATEGIES, SD: SD_STRATEGIES, SDV: SDV_STRATEGIES };
+
+// ============================================================
+// UI: RENDER STRATEGIES
+// ============================================================
+
+function renderStrategies(adType, strategies) {
+  const grid = document.getElementById(`grid-${adType}`);
+  grid.innerHTML = '';
+
+  strategies.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'strategy-card';
+    card.id = `card-${adType}-${s.id}`;
+
+    let inputsHTML = '';
+
+    if (s.inputs.includes('keywords')) {
+      inputsHTML += `
+        <div class="form-group">
+          <label class="field-label">${s.label || 'Keywords (one per line)'}</label>
+          <textarea id="${adType}-${s.id}-keywords" rows="3" placeholder="keyword one&#10;keyword two"></textarea>
+        </div>`;
+    }
+
+    if (s.inputs.includes('asins')) {
+      inputsHTML += `
+        <div class="form-group">
+          <label class="field-label">${s.label || 'Target ASINs (one per line)'}</label>
+          <textarea id="${adType}-${s.id}-asins" rows="3" placeholder="B07XYZ12345&#10;B08ABC67890"></textarea>
+        </div>`;
+    }
+
+    if (s.inputs.includes('categories')) {
+      inputsHTML += `
+        <div class="form-group">
+          <label class="field-label">${s.label || 'Browse Node IDs (one per line)'}</label>
+          <textarea id="${adType}-${s.id}-categories" rows="3" placeholder="12345678&#10;87654321"></textarea>
+          <span class="hint">Amazon browse node IDs for category targeting.</span>
+        </div>`;
+    }
+
+    if (s.inputs.includes('skcKeywords')) {
+      inputsHTML += `
+        <div class="form-group">
+          <label class="field-label">Keywords (one per line -- each creates its own campaign)</label>
+          <textarea id="${adType}-${s.id}-skcKeywords" rows="4" placeholder="tumbler 30 oz&#10;large tumbler&#10;stainless steel tumbler"></textarea>
+          <span class="hint">Each keyword = one SKC campaign named S. - SP - [Product] - [Variation] - SKC - [keyword]</span>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <label class="field-label">Match Type</label>
+          <select id="${adType}-${s.id}-skcMatchType">
+            <option value="exact">Exact</option>
+            <option value="phrase">Phrase</option>
+            <option value="broad">Broad</option>
+          </select>
+        </div>`;
+    }
+
+    if (s.inputs.includes('spcAsins')) {
+      inputsHTML += `
+        <div class="form-group">
+          <label class="field-label">Target ASINs (one per line -- each creates its own campaign)</label>
+          <textarea id="${adType}-${s.id}-spcAsins" rows="4" placeholder="B07XYZ12345&#10;B08ABC67890"></textarea>
+          <span class="hint">Each ASIN = one SPC campaign named S. - SP - [Product] - [Variation] - SPC - [ASIN]</span>
+        </div>`;
+    }
+
+    if (s.note) {
+      inputsHTML += `<p class="note-inline">${s.note}</p>`;
+    }
+
+    card.innerHTML = `
+      <label class="strategy-toggle">
+        <input type="checkbox" id="check-${adType}-${s.id}" onchange="toggleStrategy('${adType}','${s.id}',this.checked)" />
+        <span class="strategy-name">${s.name}</span>
+      </label>
+      ${inputsHTML ? `<div class="strategy-inputs" id="inputs-${adType}-${s.id}" style="display:none">${inputsHTML}</div>` : ''}
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+function toggleStrategy(adType, id, checked) {
+  const card = document.getElementById(`card-${adType}-${id}`);
+  const inputs = document.getElementById(`inputs-${adType}-${id}`);
+  if (checked) {
+    card.classList.add('active');
+    if (inputs) inputs.style.display = 'block';
+  } else {
+    card.classList.remove('active');
+    if (inputs) inputs.style.display = 'none';
+  }
+}
+
+function selectAll(adType) {
+  STRATEGY_MAP[adType].forEach(s => {
+    const cb = document.getElementById(`check-${adType}-${s.id}`);
+    if (cb && !cb.checked) { cb.checked = true; toggleStrategy(adType, s.id, true); }
+  });
+}
+
+function deselectAll(adType) {
+  STRATEGY_MAP[adType].forEach(s => {
+    const cb = document.getElementById(`check-${adType}-${s.id}`);
+    if (cb && cb.checked) { cb.checked = false; toggleStrategy(adType, s.id, false); }
+  });
+}
+
+function toggleCard(section) {
+  const body = document.getElementById(`body-${section}`);
+  const chevron = document.getElementById(`chevron-${section}`);
+  const isCollapsed = body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', !isCollapsed);
+  chevron.classList.toggle('up', !isCollapsed);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function campaignName(adType, strategyName) {
+  const product = val('product');
+  const variation = val('variation');
+  return `S. - ${adType} - ${product} - ${variation} - ${strategyName}`;
+}
+
+function adGroupName() { return val('product'); }
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function lines(text) { return text.split('\n').map(l => l.trim()).filter(Boolean); }
+
+function getLines(id) {
+  const el = document.getElementById(id);
+  return el ? lines(el.value) : [];
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  return `${m}/${d}/${y}`;
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function validate() {
+  const errors = [];
+  if (!val('product'))      errors.push('Product is required.');
+  if (!val('variation'))    errors.push('Variation is required.');
+  if (!val('dailyBudget'))  errors.push('Daily Budget is required.');
+  if (!val('defaultBid'))   errors.push('Default Bid is required.');
+  return errors;
+}
+
+function isChecked(adType, id) {
+  const cb = document.getElementById(`check-${adType}-${id}`);
+  return cb && cb.checked;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('success-msg').style.display = 'none';
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('success-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+function clearMessages() {
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('success-msg').style.display = 'none';
+}
+
+// ============================================================
+// CSV
+// ============================================================
+
+function toCSV(headers, rows) {
+  const escape = v => {
+    const s = v !== undefined && v !== null ? String(v) : '';
+    return (s.includes(',') || s.includes('"') || s.includes('\n'))
+      ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [
+    headers.join(','),
+    ...rows.map(r => headers.map(h => escape(r[h])).join(','))
+  ];
+  return lines.join('\n');
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// SP BULK GENERATION
+// ============================================================
+
+const SP_HEADERS = [
+  'Product', 'Entity', 'Operation', 'Campaign ID', 'Ad Group ID', 'Portfolio ID',
+  'Ad ID', 'Keyword ID', 'Product Targeting ID', 'Campaign Name', 'Ad Group Name',
+  'Campaign Daily Budget', 'Start Date', 'End Date', 'Campaign Targeting Type',
+  'Campaign Status', 'Ad Group Default Bid', 'Ad Group Status', 'Ad Status',
+  'ASIN', 'SKU', 'Keyword', 'Match Type', 'Bid',
+  'Keyword Status', 'Product Targeting Expression', 'Product Targeting Status'
+];
+
+function buildSP() {
+  const rows = [];
+  const portfolio   = val('portfolioId');
+  const budget      = val('dailyBudget');
+  const bid         = val('defaultBid');
+  const startDate   = formatDate(val('startDate'));
+  const asins       = getLines('advertisedAsins');
+  const agName      = adGroupName();
+
+  const spCampaignBlock = (cName, isAuto) => {
+    rows.push({
+      'Product': 'Sponsored Products', 'Entity': 'Campaign', 'Operation': 'create',
+      'Portfolio ID': portfolio, 'Campaign Name': cName,
+      'Campaign Daily Budget': budget, 'Start Date': startDate,
+      'Campaign Targeting Type': isAuto ? 'Auto' : 'Manual',
+      'Campaign Status': 'enabled',
+    });
+    rows.push({
+      'Product': 'Sponsored Products', 'Entity': 'Ad group', 'Operation': 'create',
+      'Campaign Name': cName, 'Ad Group Name': agName,
+      'Ad Group Default Bid': bid, 'Ad Group Status': 'enabled',
+    });
+    asins.forEach(asin => {
+      rows.push({
+        'Product': 'Sponsored Products', 'Entity': 'Ad', 'Operation': 'create',
+        'Campaign Name': cName, 'Ad Group Name': agName,
+        'ASIN': asin, 'Ad Status': 'enabled',
+      });
+    });
+  };
+
+  SP_STRATEGIES.forEach(s => {
+    if (!isChecked('SP', s.id)) return;
+
+    // SKC: one campaign per keyword
+    if (s.inputs.includes('skcKeywords')) {
+      const kws = getLines(`SP-${s.id}-skcKeywords`);
+      const mt  = document.getElementById(`SP-${s.id}-skcMatchType`)?.value || 'exact';
+      kws.forEach(kw => {
+        const cName = campaignName('SP', `SKC - ${kw}`);
+        spCampaignBlock(cName, false);
+        rows.push({
+          'Product': 'Sponsored Products', 'Entity': 'Keyword', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Keyword': kw, 'Match Type': mt, 'Bid': bid, 'Keyword Status': 'enabled',
+        });
+      });
+      return;
+    }
+
+    // SPC: one campaign per target ASIN
+    if (s.inputs.includes('spcAsins')) {
+      const targetAsins = getLines(`SP-${s.id}-spcAsins`);
+      targetAsins.forEach(targetAsin => {
+        const cName = campaignName('SP', `SPC - ${targetAsin}`);
+        spCampaignBlock(cName, false);
+        rows.push({
+          'Product': 'Sponsored Products', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `asin="${targetAsin}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+      return;
+    }
+
+    // Standard strategies: one campaign
+    const cName = campaignName('SP', s.name);
+    spCampaignBlock(cName, s.targeting === 'auto');
+
+    if (s.inputs.includes('keywords')) {
+      getLines(`SP-${s.id}-keywords`).forEach(kw => {
+        rows.push({
+          'Product': 'Sponsored Products', 'Entity': 'Keyword', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Keyword': kw, 'Match Type': s.matchType, 'Bid': bid, 'Keyword Status': 'enabled',
+        });
+      });
+    }
+
+    if (s.inputs.includes('asins')) {
+      getLines(`SP-${s.id}-asins`).forEach(asin => {
+        rows.push({
+          'Product': 'Sponsored Products', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `asin="${asin}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+    }
+
+    if (s.inputs.includes('categories')) {
+      getLines(`SP-${s.id}-categories`).forEach(nodeId => {
+        rows.push({
+          'Product': 'Sponsored Products', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `category="${nodeId}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+    }
+  });
+
+  return rows;
+}
+
+// ============================================================
+// SB / SBV BULK GENERATION
+// ============================================================
+
+const SB_HEADERS = [
+  'Product', 'Entity', 'Operation', 'Campaign ID', 'Ad Group ID', 'Portfolio ID',
+  'Campaign Name', 'Ad Group Name', 'Campaign Daily Budget', 'Start Date',
+  'Campaign Status', 'Ad Group Default Bid', 'Ad Group Status',
+  'Keyword', 'Match Type', 'Bid', 'Keyword Status',
+  'Product Targeting Expression', 'Product Targeting Status', 'Brand Entity ID'
+];
+
+function buildSB(adType, strategies) {
+  const rows = [];
+  const portfolio     = val('portfolioId');
+  const budget        = val('dailyBudget');
+  const bid           = val('defaultBid');
+  const startDate     = formatDate(val('startDate'));
+  const agName        = adGroupName();
+  const brandEntityId = val('brandEntityId');
+
+  strategies.forEach(s => {
+    if (!isChecked(adType, s.id)) return;
+
+    const cName = campaignName(adType, s.name);
+
+    rows.push({
+      'Product': 'Sponsored Brands', 'Entity': 'Campaign', 'Operation': 'create',
+      'Portfolio ID': portfolio, 'Campaign Name': cName,
+      'Campaign Daily Budget': budget, 'Start Date': startDate,
+      'Campaign Status': 'enabled', 'Brand Entity ID': brandEntityId,
+    });
+
+    rows.push({
+      'Product': 'Sponsored Brands', 'Entity': 'Ad group', 'Operation': 'create',
+      'Campaign Name': cName, 'Ad Group Name': agName,
+      'Ad Group Default Bid': bid, 'Ad Group Status': 'enabled',
+    });
+
+    if (s.inputs.includes('keywords')) {
+      getLines(`${adType}-${s.id}-keywords`).forEach(kw => {
+        rows.push({
+          'Product': 'Sponsored Brands', 'Entity': 'Keyword', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Keyword': kw, 'Match Type': s.matchType, 'Bid': bid, 'Keyword Status': 'enabled',
+        });
+      });
+    }
+
+    if (s.inputs.includes('asins')) {
+      getLines(`${adType}-${s.id}-asins`).forEach(asin => {
+        rows.push({
+          'Product': 'Sponsored Brands', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `asin="${asin}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+    }
+
+    if (s.inputs.includes('categories')) {
+      getLines(`${adType}-${s.id}-categories`).forEach(nodeId => {
+        rows.push({
+          'Product': 'Sponsored Brands', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `category="${nodeId}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+    }
+  });
+
+  return rows;
+}
+
+// ============================================================
+// SD / SDV BULK GENERATION
+// ============================================================
+
+const SD_HEADERS = [
+  'Product', 'Entity', 'Operation', 'Campaign ID', 'Ad Group ID', 'Portfolio ID',
+  'Campaign Name', 'Ad Group Name', 'Campaign Daily Budget', 'Start Date',
+  'Campaign Status', 'Ad Group Default Bid', 'Ad Group Status',
+  'Cost Type', 'Tactic', 'Product Targeting Expression', 'Product Targeting Status'
+];
+
+function buildSD(adType, strategies) {
+  const rows = [];
+  const portfolio = val('portfolioId');
+  const budget    = val('dailyBudget');
+  const bid       = val('defaultBid');
+  const startDate = formatDate(val('startDate'));
+  const agName    = adGroupName();
+  const costType  = val(`${adType.toLowerCase()}-costType`);
+
+  strategies.forEach(s => {
+    if (!isChecked(adType, s.id)) return;
+
+    const cName = campaignName(adType, s.name);
+
+    rows.push({
+      'Product': 'Sponsored Display', 'Entity': 'Campaign', 'Operation': 'create',
+      'Portfolio ID': portfolio, 'Campaign Name': cName,
+      'Campaign Daily Budget': budget, 'Start Date': startDate,
+      'Campaign Status': 'enabled', 'Cost Type': costType, 'Tactic': s.tactic || '',
+    });
+
+    rows.push({
+      'Product': 'Sponsored Display', 'Entity': 'Ad group', 'Operation': 'create',
+      'Campaign Name': cName, 'Ad Group Name': agName,
+      'Ad Group Default Bid': bid, 'Ad Group Status': 'enabled',
+    });
+
+    if (s.inputs.includes('asins')) {
+      getLines(`${adType}-${s.id}-asins`).forEach(asin => {
+        rows.push({
+          'Product': 'Sponsored Display', 'Entity': 'Product targeting', 'Operation': 'create',
+          'Campaign Name': cName, 'Ad Group Name': agName,
+          'Product Targeting Expression': `asin="${asin}"`,
+          'Bid': bid, 'Product Targeting Status': 'enabled',
+        });
+      });
+    }
+  });
+
+  return rows;
+}
+
+// ============================================================
+// PREVIEW
+// ============================================================
+
+function getCampaignNames(adType, strategies) {
+  const product   = val('product');
+  const variation = val('variation');
+  if (!product || !variation) return [];
+  const names = [];
+  strategies.forEach(s => {
+    if (!isChecked(adType, s.id)) return;
+    if (s.inputs.includes('skcKeywords')) {
+      getLines(`${adType}-${s.id}-skcKeywords`).forEach(kw =>
+        names.push(`S. - ${adType} - ${product} - ${variation} - SKC - ${kw}`)
+      );
+    } else if (s.inputs.includes('spcAsins')) {
+      getLines(`${adType}-${s.id}-spcAsins`).forEach(asin =>
+        names.push(`S. - ${adType} - ${product} - ${variation} - SPC - ${asin}`)
+      );
+    } else {
+      names.push(`S. - ${adType} - ${product} - ${variation} - ${s.name}`);
+    }
+  });
+  return names;
+}
+
+function previewCampaigns() {
+  clearMessages();
+  const product   = val('product');
+  const variation = val('variation');
+  if (!product || !variation) { showError('Enter Product and Variation first.'); return; }
+
+  const sections = [
+    { label: 'Sponsored Products (SP)', type: 'SP', strategies: SP_STRATEGIES },
+    { label: 'Sponsored Brands (SB)', type: 'SB', strategies: SB_STRATEGIES },
+    { label: 'Sponsored Brands Video (SBV)', type: 'SBV', strategies: SBV_STRATEGIES },
+    { label: 'Sponsored Display (SD)', type: 'SD', strategies: SD_STRATEGIES },
+    { label: 'Sponsored Display Video (SDV)', type: 'SDV', strategies: SDV_STRATEGIES },
+  ];
+
+  let html = '';
+  let total = 0;
+  sections.forEach(sec => {
+    const names = getCampaignNames(sec.type, sec.strategies);
+    if (names.length === 0) return;
+    html += `<div class="modal-section-label">${sec.label} (${names.length})</div>`;
+    html += '<div class="modal-campaigns">';
+    names.forEach(n => { html += `<div class="campaign-preview-item">${n}</div>`; total++; });
+    html += '</div>';
+  });
+
+  if (!html) { showError('No campaigns selected. Select at least one strategy to preview.'); return; }
+
+  html = `<p style="font-size:13px;color:#6b7280;margin-bottom:12px">${total} campaign${total !== 1 ? 's' : ''} will be generated.</p>` + html;
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay') || e.type === 'click' && !e.target.closest) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  } else if (!e.target.closest('.modal')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// ============================================================
+// GENERATE + DOWNLOAD
+// ============================================================
+
+function generate(adType) {
+  clearMessages();
+  const errors = validate();
+  if (errors.length) { showError(errors.join(' ')); return; }
+
+  const product   = val('product');
+  const variation = val('variation');
+  const dateStr   = today();
+  const slug      = `${product.replace(/\s+/g, '-')}_${variation.replace(/\s+/g, '-')}`;
+  const filename  = `${slug}_${adType}_${dateStr}.csv`;
+
+  let rows, headers;
+
+  switch (adType) {
+    case 'SP':
+      rows = buildSP(); headers = SP_HEADERS; break;
+    case 'SB':
+      rows = buildSB('SB', SB_STRATEGIES); headers = SB_HEADERS; break;
+    case 'SBV':
+      rows = buildSB('SBV', SBV_STRATEGIES); headers = SB_HEADERS; break;
+    case 'SD':
+      rows = buildSD('SD', SD_STRATEGIES); headers = SD_HEADERS; break;
+    case 'SDV':
+      rows = buildSD('SDV', SDV_STRATEGIES); headers = SD_HEADERS; break;
+  }
+
+  if (!rows || rows.length === 0) {
+    showError(`No ${adType} strategies selected.`);
+    return;
+  }
+
+  const csv = toCSV(headers, rows);
+  downloadCSV(csv, filename);
+  showSuccess(`Downloaded: ${filename}`);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('startDate').value = today();
+  updateCurrency();
+  renderStrategies('SP', SP_STRATEGIES);
+  renderStrategies('SB', SB_STRATEGIES);
+  renderStrategies('SBV', SBV_STRATEGIES);
+  renderStrategies('SD', SD_STRATEGIES);
+  renderStrategies('SDV', SDV_STRATEGIES);
+});
+</script>
+</body>
+</html>
