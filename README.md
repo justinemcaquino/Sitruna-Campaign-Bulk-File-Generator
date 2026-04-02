@@ -1,0 +1,1 @@
+# Sitruna-Campaign-Bulk-File-Generator
